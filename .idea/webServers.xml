@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="216fd349-deb0-4074-ba53-7283ad5707d4" name="slurm">
+        <fileTransfer rootFolder="/data/users/scasarin/" accessType="SFTP" host="hpc.scientificnet.org" port="22" sshConfigId="33c2dbdb-629b-4b1c-8c11-44dee77a857e" sshConfig="scasarin@hpc.scientificnet.org:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="ddb3c560-983b-4637-90a7-dcdbf5db1126" name="dati">
+        <fileTransfer accessType="SFTP" host="hpc.scientificnet.org" port="22" sshConfigId="33c2dbdb-629b-4b1c-8c11-44dee77a857e" sshConfig="scasarin@hpc.scientificnet.org:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
