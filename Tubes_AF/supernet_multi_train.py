@@ -1,7 +1,7 @@
 import argparse
 import datetime
 import os, sys
-sys.path.insert(0, '../')
+sys.path.insert(0, __import__('os').path.dirname(__import__('os').path.dirname(__import__('os').path.abspath(__file__))))
 import matplotlib.pyplot as plt
 import numpy as np
 import time

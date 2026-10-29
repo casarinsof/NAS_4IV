@@ -5,5 +5,13 @@ ptflops
 easydict
 PyYAML
 pillow
-torchvision==0.2.1
+torchvision
 opencv-python
+scipy
+scikit-learn
+av
+iopath
+psutil
+simplejson
+torchmetrics
+matplotlib
