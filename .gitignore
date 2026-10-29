@@ -13,3 +13,14 @@ backup.py
 *pdf
 *.bak*
 *.sh
+# Python / tooling
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.idea/
+.DS_Store
+.ipynb_checkpoints/
+build/
+dist/
