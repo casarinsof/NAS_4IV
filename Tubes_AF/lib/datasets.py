@@ -5,7 +5,7 @@ import torch
 import scipy
 import scipy.io as sio
 import sys
-sys.path.insert(0, '../../')
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from torchvision import datasets, transforms
 from torchvision.datasets.folder import ImageFolder, default_loader
 from Tubes_AF.lib.multi_datasets import MultiDatasets

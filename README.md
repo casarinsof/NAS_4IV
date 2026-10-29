@@ -1,193 +1,113 @@
+# VIM-NAS: NAS Just Once for Joint Image-Video Recognition
 
-# Neural Architecture Design and Search [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=A%20new%20collection%20of%20tiny%20and%20efficient%20models%20thru%20architecture%20design%20and%20search,%20SOTA%20performance!!&url=https://github.com/microsoft/Cream&via=houwen_peng&hashtags=NAS,ViT,vision_transformer)
+Official research code for **VIM-NAS** (Videos-IMages NAS): one-shot neural architecture search over vision transformers that handles images and videos with a single supernet. It extends the weight-entanglement supernet of [AutoFormer](https://github.com/microsoft/Cream/tree/main/AutoFormer) to video.
 
-***This is a collection of our NAS and Vision Transformer work***
+## Paper
 
-> [**TinyCLIP**](./TinyCLIP) (```@ICCV'23```): **TinyCLIP: CLIP Distillation via Affinity Mimicking and Weight Inheritance**
+**NAS Just Once: Neural Architecture Search for Joint Image-Video Recognition**
+Sofia Casarin (Free University of Bozen-Bolzano), Sergio Escalera (Computer Vision Center / Universitat de Barcelona), Oswald Lanz (Free University of Bozen-Bolzano)
+2025 IEEE/CVF International Conference on Computer Vision Workshops (ICCVW), 2025, pp. 6431-6441.
 
-> [**EfficientViT**](./EfficientViT) (```@CVPR'23```): **EfficientViT: Memory Efficient Vision Transformer with Cascaded Group Attention**
+[![ICCVW 2025](https://img.shields.io/badge/ICCVW-2025-blue)](https://ieeexplore.ieee.org/document/11375617/)
+[![DOI](https://img.shields.io/badge/DOI-10.1109%2FICCVW69036.2025.00667-green)](https://doi.org/10.1109/ICCVW69036.2025.00667)
 
-> [**TinyViT**](./TinyViT) (```@ECCV'22```): **TinyViT: Fast Pretraining Distillation for Small Vision Transformers**
+[DOI](https://doi.org/10.1109/ICCVW69036.2025.00667) | [IEEE Xplore](https://ieeexplore.ieee.org/document/11375617/)
 
-> [**MiniViT**](./MiniViT) (```@CVPR'22```): **MiniViT: Compressing Vision Transformers with Weight Multiplexing**
+**Abstract (short).** VIM-NAS is the first NAS approach that bridges NAS for videos and images: a single differentiable, weight-entangled one-shot search over a unique supernet of Vision Transformers that jointly optimizes 2D patches (images) and 3D space-time tubes (videos), embedding dim, Q-K-V dim, number of heads, MLP ratio and depth. With multi-dataset joint training, VIM-NAS reaches 84.4% top-1 on ImageNet, 90.7% on Kinetics-400, improves the state of the art on Kinetics-600 by 0.4% and the previous NAS state of the art on Something-Something V2 by 13.4%.
 
-> [**CDARTS**](./CDARTS) (```@TPAMI'22```): **Cyclic Differentiable Architecture Search**
+<p align="center"><img src="assets/vimnas_overview.png" width="90%" alt="VIM-NAS overview"></p>
 
+**Figure 1.** Left: overall components of the VIM-NAS supernet, which processes images and videos through dynamic 2D and 3D sparse overlapping tubes; the search space includes different tube shapes, dynamic transformer blocks in each layer, and depths, trained through weight entanglement. Right: the ViT block where embedding dimension, number of heads, MLP ratio and Q-K-V dim are optimized.
 
-> [**AutoFormerV2**](./AutoFormerV2) (```@NeurIPS'21```): **Searching the Search Space of Vision Transformer**
+<p align="center"><img src="assets/dataset_sampling.png" width="70%" alt="Dataset sampling schedule"></p>
 
+**Figure 2.** Dataset sampling schedule for joint training: each dataset is sampled with a probability proportional to its size, without accumulating gradients.
 
-> [**iRPE**](./iRPE) (```@ICCV'21```): **Rethinking and Improving Relative Position Encoding for Vision Transformer**
+<p align="center"><img src="assets/comparison_table.png" width="90%" alt="Comparison with NAS methods"></p>
 
+**Table 1.** Properties of VIM-NAS compared to leading NAS methods for video action recognition, image classification and Vision Transformers.
 
-> [**AutoFormer**](./AutoFormer) (```@ICCV'21```): **AutoFormer: Searching Transformers for Visual Recognition**
+<p align="center"><img src="assets/imagenet_results.png" width="90%" alt="ImageNet-1k results"></p>
 
+**Table 3.** ImageNet-1k results: hand-designed models, NAS-designed models, and the VIM-NAS models (Tiny/Small/Base/Large).
 
-> [**Cream**](./Cream) (```@NeurIPS'20```): **Cream of the Crop: Distilling Prioritized Paths For One-Shot Neural Architecture Search**
+### Mapping to code
 
-We also implemented our NAS algorithms on Microsoft [**NNI**](https://github.com/microsoft/nni) (Neural Network Intelligence).
+- `Tubes_AF/` holds the VIM-NAS supernet and search: the supernet with a sparse-tubes tokenizer (`model/module/embedding_super.py`, `model/supernet_transformer.py`) and 2D/3D positional encodings (`tubevit/`); joint multi-dataset training (`supernet_multi_train.py`, `lib/multi_datasets.py`), where at each step the dataset is drawn with probability proportional to its number of steps (`lib/samplers.py: get_next_train_modularity`); and evolutionary search (`evolution.py`). The supernet configs in `experiments/` search embedding dim, number of heads, MLP ratio and depth.
+- `Masked_AutoFormer/` holds masked-autoencoder pre-training / fine-tuning utilities and the Kinetics video pipeline, which `Tubes_AF` reuses.
 
-## News
-- :sunny: Hiring research interns for next-generation model design, efficient large model inference: houwen.peng@microsoft.com
-- :boom: Sep, 2023: Code for [**TinyCLIP**](./TinyCLIP) is now released.
-- :boom: Jul, 2023: [**TinyCLIP**](./TinyCLIP) accepted to ICCV'23
-- :boom: May, 2023: Code for [**EfficientViT**](./EfficientViT) is now released.
-- :boom: Mar, 2023: [**EfficientViT**](./EfficientViT) accepted to CVPR'23
-- :boom: Jul, 2022: Code for [**TinyViT**](./TinyViT) is now released.
-- :boom: Apr, 2022: Code for [**MiniViT**](./MiniViT) is now released.
-- :boom: Mar, 2022: [**MiniViT**](https://openaccess.thecvf.com/content/CVPR2022/html/Zhang_MiniViT_Compressing_Vision_Transformers_With_Weight_Multiplexing_CVPR_2022_paper.html) has been accepted by CVPR'22.
-- :boom: Feb, 2022: Code for [**CDARTS**](./CDARTS) is now released.
-- :boom: Feb, 2022: [**CDARTS**](./CDARTS) has been accepted by TPAMI'22.
-- :boom: Jan, 2022: Code for [**AutoFormerV2**](./AutoFormerV2) is now released.
-- :boom: Oct, 2021: [**AutoFormerV2**](./AutoFormerV2) has been accepted by NeurIPS'21, code will be released soon.
-- :boom: Aug, 2021: Code for [**AutoFormer**](./AutoFormer) is now released.
-- :boom: July, 2021: [**iRPE code**](./iRPE) (**with CUDA Acceleration**) is now released. Paper is [here](https://openaccess.thecvf.com/content/ICCV2021/html/Wu_Rethinking_and_Improving_Relative_Position_Encoding_for_Vision_Transformer_ICCV_2021_paper.html).
-- :boom: July, 2021: [**iRPE**](https://openaccess.thecvf.com/content/ICCV2021/html/Wu_Rethinking_and_Improving_Relative_Position_Encoding_for_Vision_Transformer_ICCV_2021_paper.html) has been accepted by ICCV'21.
-- :boom: July, 2021: [**AutoFormer**](https://openaccess.thecvf.com/content/ICCV2021/html/Chen_AutoFormer_Searching_Transformers_for_Visual_Recognition_ICCV_2021_paper.html) has been accepted by ICCV'21.
-- :boom: July, 2021: [**AutoFormer**](./AutoFormer) is now available on [arXiv](https://arxiv.org/abs/2107.00651).
-- :boom: Oct, 2020: Code for [**Cream**](./Cream) is now released.
-- :boom: Oct, 2020: [**Cream**](./Cream) was accepted to NeurIPS'20
-
-## Works
-
-### [TinyCLIP](./TinyCLIP)
-**TinyCLIP** is a novel **cross-modal distillation** method for large-scale language-image pre-trained models. The method introduces two core techniques: **affinity mimicking** and **weight inheritance**. This work unleashes the capacity of small CLIP models, fully leveraging large-scale models as well as pre-training data and striking the best trade-off between speed and accuracy.
-<div align="center">
-    <img width="85%" alt="TinyCLIP overview" src="./TinyCLIP/figure/TinyCLIP.jpg"/>
-</div>
-
-### [EfficientViT](./EfficientViT)
-**EfficientViT** is a family of high-speed vision transformers. It is built with a new memory efficient building block with a **sandwich layout**, and an efficient **cascaded group attention** operation which mitigates attention computation redundancy. 
-<div align="center">
-    <img width="69%" alt="EfficientViT overview" src="./EfficientViT/classification/.figures/efficientvit_main_static.png"/>
-</div>
-
-### [TinyViT](./TinyViT)
-TinyViT is a new family of **tiny and efficient** vision transformers pretrained on **large-scale** datasets with our proposed **fast distillation framework**. The central idea is to **transfer knowledge** from **large pretrained models** to small ones. The logits of large teacher models are sparsified and stored in disk in advance to **save the memory cost and computation overheads**.
-<div align="center">
-    <img width="80%" alt="TinyViT overview" src="./TinyViT/.figure/framework.png"/>
-</div>
-
-### [MiniViT](./MiniViT)
-MiniViT is a new compression framework that achieves parameter reduction in vision transformers while retaining the same performance. The central idea of MiniViT is to multiplex the weights of consecutive transformer blocks. Specifically, we make the weights shared across layers, while imposing a transformation on the weights to increase diversity. Weight distillation over self-attention is also applied to transfer knowledge from large-scale ViT models to weight-multiplexed compact models.
-<div align="center">
-    <img width="70%" alt="MiniViT overview" src="./MiniViT/.figure/framework.png"/>
-</div>
-
-### [CDARTS](./CDARTS)
-In this work, we propose new joint optimization objectives and a novel Cyclic Differentiable ARchiTecture Search framework, dubbed CDARTS. Considering the structure difference, CDARTS builds a cyclic feedback mechanism between the search and evaluation networks with introspective distillation. 
-<div align="center">
-    <img width="50%" alt="CDARTS overview" src="CDARTS/demo/framework1.png"/>
-</div>
+The released code is a research snapshot; some configs and defaults may not match the exact settings reported in the paper.
 
 
-### [AutoFormerV2](./AutoFormerV2)
-In this work, instead of searching the architecture in a predefined search space, with the help of AutoFormer, we proposed to search the search space to automatically find a great search space first. 
-After that we search the architectures in the searched space. In addition, we provide insightful observations and guidelines for general vision transformer design.
-<div align="center">
-    <img width="70%" alt="AutoFormerV2 overview" src="AutoFormerV2/.figure/overview.jpg"/>
-</div>
+## Contents
 
+- **[`Tubes_AF/`](Tubes_AF/README.md)**: AutoFormer-style supernet for video. Adds a sparse-tubes tokenizer (`SparseTubesTokenizerSuper`), 3D sin-cos positional encodings (`tubevit/`), a self-attention-pooling head, and single/multi-dataset supernet training (`supernet_train.py`, `supernet_multi_train.py`) plus evolutionary search (`evolution.py`). Configs in `experiments/`.
+- **`Masked_AutoFormer/`**: masked-autoencoder-style supernet (`supernet_autoencoder.py`, `video_vit.py`) with pre-training (`supernet_pretrain.py`), fine-tuning (`supernet_finetune.py`) and evolutionary search; Kinetics video data pipeline in `util/`.
+- **`third_party/cream/`**: unmodified copy of [microsoft/Cream](https://github.com/microsoft/Cream) (AutoFormer, AutoFormerV2, CDARTS, Cream, EfficientViT, MiniViT, TinyCLIP, TinyViT), kept for reference and baselines. Each sub-project has its own README and is self-contained.
+- **`assets/`**: figures for the README.
 
-### [AutoFormer](./AutoFormer)
+## Repository structure
 
-AutoFormer is new one-shot architecture search framework dedicated to vision transformer search. It entangles the weights of different vision transformer blocks in the same layers during supernet training. 
-Benefiting from the strategy, the trained supernet allows thousands of subnets to be very well-trained. Specifically, the performance of these subnets with weights inherited from the supernet is comparable to those retrained from scratch.
-<div align="center">
-    <img width="70%" alt="AutoFormer overview" src="AutoFormer/.figure/overview.png"/>
-</div>
+```
+.
+├── Tubes_AF/            # video supernet (sparse tubes) + search
+│   ├── lib/  model/  tubevit/  experiments/
+│   └── supernet_train.py  supernet_multi_train.py  supernet_engine.py  evolution.py
+├── Masked_AutoFormer/   # masked-autoencoder supernet + search
+│   ├── lib/  model/  util/  experiments/
+│   └── supernet_pretrain.py  supernet_finetune.py  evolution.py
+├── third_party/cream/   # upstream Microsoft Cream projects (MIT)
+├── assets/
+└── LICENSE
+```
 
-### [iRPE](./iRPE)
-**Image RPE (iRPE for short) methods are new relative position encoding methods dedicated to 2D images**, considering directional relative distance modeling as well as the interactions between queries and relative position embeddings in self-attention mechanism. The proposed iRPE methods are simple and lightweight, being easily plugged into transformer blocks. Experiments demonstrate that solely due to the proposed encoding methods, **DeiT and DETR obtain up to 1.5% (top-1 Acc) and 1.3% (mAP) stable improvements** over their original versions on ImageNet and COCO respectively, without tuning any extra hyperparamters such as learning rate and weight decay. Our ablation and analysis also yield interesting findings, some of which run counter to previous understanding.
-<div align="center">
-    <img width="70%" alt="iRPE overview" src="iRPE/iRPE.png"/>
-</div>
+## Installation
 
+```bash
+conda create -n nas4iv python=3.8
+conda activate nas4iv
+pip install -r Tubes_AF/requirements.txt        # or Masked_AutoFormer/requirements.txt
+```
 
-### [Cream](./Cream)
-**[[Paper]](https://papers.nips.cc/paper/2020/file/d072677d210ac4c03ba046120f0802ec-Paper.pdf) [[Models-Google Drive]](https://drive.google.com/drive/folders/1NLGAbBF9bA1IUAxKlk2VjgRXhr6RHvRW?usp=sharing)[[Models-Baidu Disk (password: wqw6)]](https://pan.baidu.com/s/1TqQNm2s14oEdyNPimw3T9g) [[Slides]]() [[BibTex]](https://scholar.googleusercontent.com/scholar.bib?q=info:ICWVXc_SsKAJ:scholar.google.com/&output=citation&scisdr=CgUmooXfEMfTi0cV5aU:AAGBfm0AAAAAX7sQ_aXoamdKRaBI12tAVN8REq1VKNwM&scisig=AAGBfm0AAAAAX7sQ_RdYtp6BSro3zgbXVJU2MCgsG730&scisf=4&ct=citation&cd=-1&hl=ja)**  <br/>
+`Tubes_AF` imports `Masked_AutoFormer.util.kinetics`, so both folders must stay side by side; the scripts add the repository root to `sys.path` automatically.
 
-In this work, we present a simple yet effective architecture distillation method. The central idea is that subnetworks can learn collaboratively and teach each other throughout the training process, aiming to boost the convergence of individual models. We introduce the concept of prioritized path, which refers to the architecture candidates exhibiting superior performance during training. Distilling knowledge from the prioritized paths is able to boost the training of subnetworks. Since the prioritized paths are changed on the fly depending on their performance and complexity, the final obtained paths are the cream of the crop.
-<div >
-    <img src="Cream/demo/intro.jpg" width="90%"/>
-</div>
+## Usage
 
+Run scripts from inside the project folder (they use project-local imports such as `lib`, `model`). Exact argument values depend on your data and hardware; see `--help` for all options.
 
-## Bibtex
+```bash
+cd Tubes_AF
+python supernet_train.py --cfg experiments/supernet/supernet-T.yaml --data-path /path/to/video_data --data-set k600 ...
+python supernet_multi_train.py --cfg experiments/supernet/supernet-T.yaml --data-path /path/a /path/b ...
+python evolution.py --cfg experiments/subnet/AutoFormer-T.yaml ...
+
+cd ../Masked_AutoFormer
+python supernet_pretrain.py --cfg experiments/supernet/supernet-T.yaml ...
+python supernet_finetune.py --cfg experiments/supernet/supernet-T.yaml ...
+```
+
+## Data
+
+- `Tubes_AF`: video datasets (default path in the code points to a Kinetics-600 layout; `--data-path` accepts several paths for multi-dataset training). Image datasets (ImageNet, CIFAR, etc.) are supported through `lib/datasets.py`.
+- `Masked_AutoFormer`: Kinetics-style video folders and ImageNet (`--data-set IMNET`).
+
+## Citation
+
 ```bibtex
-@InProceedings{tinyclip,
-    title     = {TinyCLIP: CLIP Distillation via Affinity Mimicking and Weight Inheritance},
-    author    = {Wu, Kan and Peng, Houwen and Zhou, Zhenghong and Xiao, Bin and Liu, Mengchen and Yuan, Lu and Xuan, Hong and Valenzuela, Michael and Chen, Xi (Stephen) and Wang, Xinggang and Chao, Hongyang and Hu, Han},
-    booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
-    month     = {October},
-    year      = {2023},
-    pages     = {21970-21980}
-}
-
-@InProceedings{liu2023efficientvit,
-    title     = {EfficientViT: Memory Efficient Vision Transformer with Cascaded Group Attention},
-    author    = {Liu, Xinyu and Peng, Houwen and Zheng, Ningxin and Yang, Yuqing and Hu, Han and Yuan, Yixuan},
-    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-    year      = {2023},
-}
-
-@InProceedings{tiny_vit,
-  title={TinyViT: Fast Pretraining Distillation for Small Vision Transformers},
-  author={Wu, Kan and Zhang, Jinnian and Peng, Houwen and Liu, Mengchen and Xiao, Bin and Fu, Jianlong and Yuan, Lu},
-  booktitle={European conference on computer vision (ECCV)},
-  year={2022}
-}
-
-@InProceedings{MiniViT,
-    title     = {MiniViT: Compressing Vision Transformers With Weight Multiplexing},
-    author    = {Zhang, Jinnian and Peng, Houwen and Wu, Kan and Liu, Mengchen and Xiao, Bin and Fu, Jianlong and Yuan, Lu},
-    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-    month     = {June},
-    year      = {2022},
-    pages     = {12145-12154}
-}
-
-@article{CDARTS,
-  title={Cyclic Differentiable Architecture Search},
-  author={Yu, Hongyuan and Peng, Houwen and Huang, Yan and Fu, Jianlong and Du, Hao and Wang, Liang and Ling, Haibin},
-  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
-  year={2022}
-}
-
-@article{S3,
-  title={Searching the Search Space of Vision Transformer},
-  author={Minghao, Chen and Kan, Wu and Bolin, Ni and Houwen, Peng and Bei, Liu and Jianlong, Fu and Hongyang, Chao and Haibin, Ling},
-  booktitle={Conference and Workshop on Neural Information Processing Systems (NeurIPS)},
-  year={2021}
-}
-
-@InProceedings{iRPE,
-    title     = {Rethinking and Improving Relative Position Encoding for Vision Transformer},
-    author    = {Wu, Kan and Peng, Houwen and Chen, Minghao and Fu, Jianlong and Chao, Hongyang},
-    booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
-    month     = {October},
-    year      = {2021},
-    pages     = {10033-10041}
-}
-
-@InProceedings{AutoFormer,
-    title     = {AutoFormer: Searching Transformers for Visual Recognition},
-    author    = {Chen, Minghao and Peng, Houwen and Fu, Jianlong and Ling, Haibin},
-    booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
-    month     = {October},
-    year      = {2021},
-    pages     = {12270-12280}
-}
-
-@article{Cream,
-  title={Cream of the Crop: Distilling Prioritized Paths For One-Shot Neural Architecture Search},
-  author={Peng, Houwen and Du, Hao and Yu, Hongyuan and Li, Qi and Liao, Jing and Fu, Jianlong},
-  journal={Advances in Neural Information Processing Systems},
-  volume={33},
-  year={2020}
+@inproceedings{casarin2025nasjustonce,
+  author    = {Casarin, Sofia and Escalera, Sergio and Lanz, Oswald},
+  title     = {NAS Just Once: Neural Architecture Search for Joint Image-Video Recognition},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision Workshops (ICCVW)},
+  year      = {2025},
+  pages     = {6431--6441},
+  doi       = {10.1109/ICCVW69036.2025.00667}
 }
 ```
 
-## License
-License under an MIT license.
+## Acknowledgements
 
+This work builds on [AutoFormer](https://github.com/microsoft/Cream/tree/main/AutoFormer) and the rest of [microsoft/Cream](https://github.com/microsoft/Cream) (Microsoft Corporation, MIT License), and the masked-autoencoder video code derives from Meta Platforms' MAE-style code (see file headers). Original third-party READMEs, licenses and the Microsoft code of conduct/security policy are preserved under `third_party/cream/`.
+
+## License
+
+MIT; see [LICENSE](LICENSE) (copyright Microsoft Corporation for the upstream code).
